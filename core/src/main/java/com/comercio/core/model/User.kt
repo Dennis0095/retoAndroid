@@ -3,7 +3,7 @@ package com.comercio.core.model
 data class User(
     val id: Int,
     val name: String,
-    val userName: String,
+    val username: String,
     val email: String,
     val address: Address,
     val phone: String,

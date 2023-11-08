@@ -1,21 +1,30 @@
 package com.comercio.retoandroid.ui.feature.user
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.comercio.core.model.Address
-import com.comercio.core.model.Company
-import com.comercio.core.model.Geolocation
+import android.view.View
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.comercio.core.model.User
-import com.comercio.retoandroid.R
+import com.comercio.core.model.create_post.CreatePost
+import com.comercio.core.model.create_post.CreatePostEventResult
+import com.comercio.core.model.create_post.CreatePostResponse
+import com.comercio.core.model.get_posts.GetPostsEventResult
+import com.comercio.core.model.user.GetUserEventResult
 import com.comercio.retoandroid.databinding.ActivityUsersBinding
+import com.comercio.retoandroid.ui.feature.user.adapter.AdapterPost
 import com.comercio.retoandroid.ui.feature.user.adapter.AdapterUser
+import com.comercio.retoandroid.ui.feature.user.dialog.DialogCreatePost
 import com.comercio.retoandroid.ui.util.UtilRecyclerView
+import dagger.hilt.android.AndroidEntryPoint
 
-class UsersActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class UsersActivity : AppCompatActivity() , DialogCreatePost.ActionDialogCreatePost{
     lateinit var binding: ActivityUsersBinding
     lateinit var adapterUser: AdapterUser
+    lateinit var adapterPost: AdapterPost
     private var listUser = ArrayList<User>()
+    private var listPost = ArrayList<CreatePostResponse>()
+    private val userViewModel: UserViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,87 +32,66 @@ class UsersActivity : AppCompatActivity() {
         setContentView(binding.root)
         UtilRecyclerView.config(binding.rvUsers, true, this)
         UtilRecyclerView.config(binding.rvPosts, false, this)
-        setAdapterUser()
+        userViewModel.getUsers()
+        userViewModel.getPosts()
+        observeUsers()
+        observeGetPosts()
+        observeCreatePost()
+        binding.btnCreatePost.setOnClickListener { showDialogCreatePost() }
     }
 
+    private fun observeUsers() {
+        userViewModel.usersViewModel.observe(this) {
+            when (it) {
+                is GetUserEventResult.ShowUsers -> {
+                    listUser = it.data
+                    setAdapterUser()
+                }
+                GetUserEventResult.UsersEmpty -> {}
+            }
+        }
+    }
+    private fun observeCreatePost() {
+        userViewModel.createPostViewModel.observe(this) {
+            when (it) {
+                is CreatePostEventResult.ErrorGeneral -> {}
+                is CreatePostEventResult.Success -> {
+                    listPost.add(0, it.data)
+                    adapterPost.notifyDataSetChanged()
+                }
+            }
+        }
+    }
+    private fun observeGetPosts() {
+        userViewModel.getPostsViewModel.observe(this) {
+            when (it) {
+                is GetPostsEventResult.ErrorGeneral -> {}
+                is GetPostsEventResult.Success -> {
+                    binding.tvNotPost.visibility = View.GONE
+                    binding.rvPosts.visibility = View.VISIBLE
+                    listPost = it.data
+                    setAdapterPosts()
+                }
+            }
+        }
+    }
+
+    private fun setAdapterPosts() {
+        adapterPost = AdapterPost(listPost)
+        binding.rvPosts.adapter = adapterPost
+    }
 
     private fun setAdapterUser() {
-        listUser.add(User(id = 1, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-
-        listUser.add(User(id = 2, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-
-        listUser.add(User(id = 3, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-
-        listUser.add(User(id = 4, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-
-        listUser.add(User(id = 5, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-
-        listUser.add(User(id = 6, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-
-        listUser.add(User(id = 7, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-        listUser.add(User(id = 8, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-        listUser.add(User(id = 9, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-
-        listUser.add(User(id = 10, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-
-        listUser.add(User(id = 11, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-        listUser.add(User(id = 12, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-        listUser.add(User(id = 13, name = "Dennis", userName = "dmendez", email = "dnrich95@gmail.com",
-            address = Address(street = "Kulas Light", suite = "Apt. 556", city = "Gwenborough", zipcode = "92998-3874",
-            geo = Geolocation(lat = "-37.3159", lng = "81.1496")), phone = "770-736-8031", website = "hildegard.org", company = Company(name = "Romaguera-Crona", catchPhrase = "Multi-layered client-server neural-net",
-            bs = "")
-        ))
-
-
         adapterUser = AdapterUser(listUser)
         binding.rvUsers.adapter = adapterUser
+    }
+
+    fun showDialogCreatePost() {
+        val dialog = DialogCreatePost(this)
+        supportFragmentManager.let { dialog.show(it, "") }
+    }
+
+    override fun clickCreatepost(title: String, description: String) {
+        userViewModel.createPost(CreatePost(title = title, body = description))
     }
 }

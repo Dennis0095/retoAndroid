@@ -10,23 +10,23 @@ import com.comercio.retoandroid.databinding.ItemUserBinding
 
 class AdapterUser(
     private val itemList: List<User>
-) : RecyclerView.Adapter<AdapterUser.ViewHolder>(){
+) : RecyclerView.Adapter<AdapterUser.ViewHolder>() {
 
 
     inner class ViewHolder(private val binding: ItemUserBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(questionItem: User) {
-            /*val objQuestion: Question = questionItem.getFrequentQuestions()
-            binding.tvQuestion.text = objQuestion.question
+        fun bind(user: User) {
+            binding.tvPhone.text = user.phone
+            binding.tvEmail.text = user.email
+            binding.tvName.text = user.name
+            binding.tvUsername.text = user.username
 
-            if (questionItem.tag.compareTo("SI") == 0) {
-                // Lógica para cuando el tag es "SI"
-            } else {
-                // Lógica para otros casos
-            }*/
+            val address = user.address
+            binding.tvAddress.text = listOf(address.street, address.suite, address.city).joinToString(", ")
+            binding.tvWeb.text = user.website
+            binding.tvCompany.text = user.company.name
 
-            // Configura eventos de clic u otras lógicas según sea necesario
             binding.ibToggle.setOnClickListener {
                 toggleSectionText(binding.ibToggle, binding.llExpandText)
             }
@@ -39,7 +39,6 @@ class AdapterUser(
             llExpandText.visibility = View.VISIBLE
         } else {
             llExpandText.visibility = View.GONE
-            //ViewAnimation.collapse(lyt_expand_text)
         }
     }
 
@@ -66,10 +65,5 @@ class AdapterUser(
 
     override fun getItemCount(): Int {
         return itemList.size
-    }
-
-
-    interface OnClickEvent {
-        fun onClick(position: Int, tag: String)
     }
 }
