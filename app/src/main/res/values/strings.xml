@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Reto Android</string>
+    <string name="welcome">Bienvenido</string>
+    <string name="logIn">Inicia sesión</string>
+    <string name="email">Correo electrónico</string>
+    <string name="password">Contraseña</string>
+    <string name="forgotPassword">¿Olvidaste tu contraseña?</string>
+    <string name="rememberEmail">Recordar correo</string>
+    <string name="into">Ingresar</string>
+    <string name="createApost">Crear un post</string>
 </resources>

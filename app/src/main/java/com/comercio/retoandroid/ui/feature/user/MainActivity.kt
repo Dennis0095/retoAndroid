@@ -1,4 +1,4 @@
-package com.comercio.retoandroid.ui.feature.main
+package com.comercio.retoandroid.ui.feature.user
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
